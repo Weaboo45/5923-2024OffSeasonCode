@@ -83,6 +83,7 @@ public class RobotContainer {
   public static final ScoringSubsystem scoreSub = new ScoringSubsystem();
   public static final ArmSubsystem armSub = new ArmSubsystem();
   public static final ClimberSubsystem climbSub = new ClimberSubsystem();
+  public static final YeetCannonPID yeetSub = new YeetCannonPID();
 
   /// OI DEVICES / HARDWARE ///
   private final XboxController xbox = new XboxController(0);
@@ -204,24 +205,24 @@ public class RobotContainer {
     //ampScoring.whileTrue( new ParallelCommandGroup( new AutoIntake(scoreSub), new AutoShoot(scoreSub) ) );
 
     //shooter button
-    shooterOn.whileTrue
+    shooterOn.onTrue
     (Commands.run(
       ()-> {
-        scoreSub.shooterOn();
-      }, scoreSub));
+        yeetSub.intakeOff();
+      }, yeetSub));
 
       //intake buttons
-    intakeFoward.whileTrue
+    intakeFoward.onTrue
     (Commands.run(
       ()-> {
-          scoreSub.intakeFoward();
-      }, scoreSub));
+          yeetSub.intakeFoward();
+      }, yeetSub));
 
-    intakeBackward.whileTrue
+    intakeBackward.onTrue
     (Commands.run(
       ()-> {
-        scoreSub.intakeBackward();
-      }, scoreSub));
+        yeetSub.intakeBackward();
+      }, yeetSub));
 
     //climb buttons
     /*

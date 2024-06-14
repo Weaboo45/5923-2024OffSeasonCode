@@ -30,10 +30,10 @@ public final class Constants {
   public static final int rightArmMotorID = 10;
   public static final int leftArmMotorID = 11;
 
-  public static final int topShooterMotorID = 12;
-  public static final int bottomShooterMotorID = 13;
+  public static final int topShooterMotorID = 17; //12
+  public static final int bottomShooterMotorID = 18; //13
 
-  public static final int intakeMotorID = 14;
+  public static final int intakeMotorID = 19; //14
 
     public static final Mode currentMode = Mode.REAL;
 
@@ -217,5 +217,14 @@ public final class Constants {
 
       public static final int rightCLimberServoID = 1;
       public static final int leftClimberServoID = 9;
+    }
+
+    public static final class ShooterConstants {
+      public static final int topShooterMotorID = 12; //12
+      public static final int bottomShooterMotorID = 13; //13
+      public static final int intakeMotorID = 14; //14
+
+      public static final int wheelDiameter = 6; //inches
+
     }
 }

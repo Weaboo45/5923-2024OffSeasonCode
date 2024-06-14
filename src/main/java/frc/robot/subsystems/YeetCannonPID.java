@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkMax;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class YeetCannonPID extends SubsystemBase {
+  //private final ShuffleboardTab tab = Shuffleboard.getTab("Competition Robot");
     //shooter motors
     private CANSparkMax topShooterMotor;
     private CANSparkMax bottomShooterMotor;
@@ -31,13 +34,13 @@ public class YeetCannonPID extends SubsystemBase {
     private SparkPIDController topController, bottomController;
 
     //PID variables
-    public double kP, kI, kD, kIz, kFF, maxRPM, setpoint;
+    public double kP, kI, kD, kFF, maxRPM, setpoint = 0;
 
     public YeetCannonPID(){
         //motors
-        topShooterMotor = new CANSparkMax(Constants.topShooterMotorID, MotorType.kBrushless);
-        bottomShooterMotor = new CANSparkMax(Constants.bottomShooterMotorID, MotorType.kBrushless);
-        intakeMotor = new CANSparkMax(Constants.intakeMotorID, MotorType.kBrushed);
+        topShooterMotor = new CANSparkMax(Constants.ShooterConstants.topShooterMotorID, MotorType.kBrushless);
+        bottomShooterMotor = new CANSparkMax(Constants.ShooterConstants.bottomShooterMotorID, MotorType.kBrushless);
+        intakeMotor = new CANSparkMax(Constants.ShooterConstants.intakeMotorID, MotorType.kBrushed);
         
         //encoders
         topEncoder = topShooterMotor.getEncoder();
@@ -51,9 +54,14 @@ public class YeetCannonPID extends SubsystemBase {
         kP = 0; 
         kI = 0;
         kD = 0; 
-        kIz = 0; 
         kFF = 0;
-        maxRPM = 500;
+        maxRPM = 2000;
+
+        SmartDashboard.putNumber("P", kP);
+        SmartDashboard.putNumber("I", kI);
+        SmartDashboard.putNumber("D", kD);
+        SmartDashboard.putNumber("FF", kFF);
+        SmartDashboard.putNumber("Setpoint", setpoint);
 
         configBottorShooterMotor();
         configTopShooterMotor();
@@ -103,18 +111,23 @@ public class YeetCannonPID extends SubsystemBase {
         bottomEncoder.setPosition(0);
       }
 
+      public double getError(){
+        double err = setpoint - -topEncoder.getVelocity();
+        return err;
+      }
+
       @Override
       public void periodic() {
         //read set point
         double newSetpoint = SmartDashboard.getNumber("Setpoint", 0);
-        if((newSetpoint != setpoint)) { setpoint = newSetpoint;}
+        if((newSetpoint != setpoint)&& newSetpoint <= maxRPM) { setpoint = newSetpoint;}
         
         //read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P Gain", 0);
-        double i = SmartDashboard.getNumber("I Gain", 0);
-        double d = SmartDashboard.getNumber("D Gain", 0);
+        double p = SmartDashboard.getNumber("P", 0);
+        double i = SmartDashboard.getNumber("I", 0);
+        double d = SmartDashboard.getNumber("D", 0);
         //double iz = SmartDashboard.getNumber("I Zone", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
+        double ff = SmartDashboard.getNumber("FF", 0);
         //double max = SmartDashboard.getNumber("Max Output", 0);
         //double min = SmartDashboard.getNumber("Min Output", 0);
 
@@ -135,13 +148,33 @@ public class YeetCannonPID extends SubsystemBase {
         if((ff != kFF)) { bottomController.setFF(ff); kFF = ff; }
 
 
-        topController.setReference(setpoint, CANSparkMax.ControlType.kVelocity);
+        topController.setReference(-setpoint, CANSparkMax.ControlType.kVelocity);
+        //topController.setReference(setpoint, CANSparkMax.ControlType.kVelocity, 0, kFF);
         bottomController.setReference(setpoint, CANSparkMax.ControlType.kVelocity);
-        
-        SmartDashboard.putNumber("Top RPM", topEncoder.getVelocity());
-        SmartDashboard.putNumber("Bottom RPM", bottomEncoder.getVelocity());
 
-        Logger.recordOutput("Top shooter rpm", topEncoder.getVelocity());
-        Logger.recordOutput("Bottom shooter rpm", bottomEncoder.getVelocity());
+        SmartDashboard.putNumber("Top RPM", -topEncoder.getVelocity());
+        SmartDashboard.putNumber("Bottom RPM", -bottomEncoder.getVelocity());
+
+        SmartDashboard.putNumber("RPM Error", getError());
+        Logger.recordOutput("RPM Error", getError());
+
+        //Shuffleboard.selectTab(tab.getTitle());
+        //ShuffleboardLayout pidGraph = tab.getLayout("PID Graph", BuiltInLayouts.kGrid).withSize(3, 3);
+        //pidGraph.addNumber("RPM Error vs Time", ()-> getError()).withWidget(BuiltInWidgets.kGraph);
+
+        Logger.recordOutput("Top shooter rpm", -topEncoder.getVelocity());
+        Logger.recordOutput("Bottom shooter rpm", -bottomEncoder.getVelocity());
+    }
+
+    public void intakeFoward(){
+      intakeMotor.set(1.0);
+    }
+  
+    public void intakeBackward(){
+      intakeMotor.set(-1.0);
+    }
+  
+    public void intakeOff(){
+      intakeMotor.set(0.0);
     }
 }

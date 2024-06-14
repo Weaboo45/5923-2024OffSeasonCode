@@ -82,8 +82,8 @@ public class ScoringSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Arm Encoder angle", getRevEncoder());
       SmartDashboard.putNumber("Arm distance traveled", getDistance());
 
-      SmartDashboard.putNumberArray("Arm Motor Temps", getTemp());
-      SmartDashboard.putNumberArray("Arm Motor Currents", getCurrent());
+      //SmartDashboard.putNumberArray("Arm Motor Temps", getTemp());
+      //SmartDashboard.putNumberArray("Arm Motor Currents", getCurrent());
   }
 
   public void hold(TrapezoidProfile.State setpoint){
