@@ -15,12 +15,12 @@ import java.util.Map;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
+//import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
+//import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PS4Controller;
+//import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
@@ -35,12 +35,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+//import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+//import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.manual.JoyStickCommands.*;
 import frc.robot.commands.manual.ControllerCommands.*;
-import frc.robot.commands.automatic.*;
 import frc.robot.commands.autonomous.SimpleAutonomous;
 import frc.robot.subsystems.*;
 
@@ -69,9 +68,6 @@ public class RobotContainer {
     configureBindings();
     configureShuffleboardData();
     configureSmartDashboard();
-
-    NamedCommands.registerCommand("Intake", intakeComand);
-    NamedCommands.registerCommand("Shoot", shootComand);
 
     //NamedCommands.registerCommand("ScoreAmp", ampScore);
 
@@ -110,9 +106,6 @@ public class RobotContainer {
   /// COMMANDS ///
   // Auto Commands
   private final SimpleAutonomous simpleAuto = new SimpleAutonomous(scoreSub, drivetrain);
-
-  private final AutoIntake intakeComand = new AutoIntake(scoreSub);
-  private final AutoShoot shootComand = new AutoShoot(scoreSub);
 
   // Xbox controls
   private final DriveSwerve drivetrainXbox = new DriveSwerve(drivetrain, () -> -xbox.getLeftY(), ()-> xbox.getLeftX(), ()-> -xbox.getRightX(),
