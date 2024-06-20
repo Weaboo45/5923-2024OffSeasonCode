@@ -1,10 +1,7 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkMax;
@@ -14,6 +11,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+//import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -34,13 +32,16 @@ public class YeetCannonPID extends SubsystemBase {
     private SparkPIDController topController, bottomController;
 
     //PID variables
-    public double kP, kI, kD, kFF, maxRPM, setpoint = 0;
+    public double maxRPM, setpoint = 0;
+
+    //private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
+      //Constants.ShooterConstants.driveKS, Constants.ShooterConstants.driveKV, Constants.ShooterConstants.driveKA);
 
     public YeetCannonPID(){
         //motors
-        topShooterMotor = new CANSparkMax(Constants.ShooterConstants.topShooterMotorID, MotorType.kBrushless);
-        bottomShooterMotor = new CANSparkMax(Constants.ShooterConstants.bottomShooterMotorID, MotorType.kBrushless);
-        intakeMotor = new CANSparkMax(Constants.ShooterConstants.intakeMotorID, MotorType.kBrushed);
+        topShooterMotor = new CANSparkMax(ShooterConstants.topShooterMotorID, MotorType.kBrushless);
+        bottomShooterMotor = new CANSparkMax(ShooterConstants.bottomShooterMotorID, MotorType.kBrushless);
+        intakeMotor = new CANSparkMax(ShooterConstants.intakeMotorID, MotorType.kBrushed);
         
         //encoders
         topEncoder = topShooterMotor.getEncoder();
@@ -50,17 +51,9 @@ public class YeetCannonPID extends SubsystemBase {
         topController = topShooterMotor.getPIDController();
         bottomController = bottomShooterMotor.getPIDController();
 
-        //PID Values
-        kP = 0; 
-        kI = 0;
-        kD = 0; 
-        kFF = 0;
-        maxRPM = 2000;
+        //Max RPM
+        maxRPM = 4000;
 
-        SmartDashboard.putNumber("P", kP);
-        SmartDashboard.putNumber("I", kI);
-        SmartDashboard.putNumber("D", kD);
-        SmartDashboard.putNumber("FF", kFF);
         SmartDashboard.putNumber("Setpoint", setpoint);
 
         configBottorShooterMotor();
@@ -95,14 +88,14 @@ public class YeetCannonPID extends SubsystemBase {
       }
 
       private void configControllers(){
-        topController.setP(kP);
-        topController.setI(kI);
-        topController.setD(kD);
+        topController.setP(ShooterConstants.topkP);
+        topController.setI(ShooterConstants.topkI);
+        topController.setFF(ShooterConstants.topkFF);
         topController.setOutputRange(-1, 1);
 
-        bottomController.setP(kP);
-        bottomController.setI(kI);
-        bottomController.setD(kD);
+        bottomController.setP(ShooterConstants.bottomkP);
+        bottomController.setI(ShooterConstants.bottomkI);
+        bottomController.setFF(ShooterConstants.bottomkFF);
         bottomController.setOutputRange(-1, 1);
       }
     
@@ -121,36 +114,10 @@ public class YeetCannonPID extends SubsystemBase {
         //read set point
         double newSetpoint = SmartDashboard.getNumber("Setpoint", 0);
         if((newSetpoint != setpoint)&& newSetpoint <= maxRPM) { setpoint = newSetpoint;}
-        
-        //read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P", 0);
-        double i = SmartDashboard.getNumber("I", 0);
-        double d = SmartDashboard.getNumber("D", 0);
-        //double iz = SmartDashboard.getNumber("I Zone", 0);
-        double ff = SmartDashboard.getNumber("FF", 0);
-        //double max = SmartDashboard.getNumber("Max Output", 0);
-        //double min = SmartDashboard.getNumber("Min Output", 0);
 
-        //if PID coefficients on SmartDashboard have changed, write new values to controller
-        if((p != kP)) { topController.setP(p); kP = p; }
-        if((i != kI)) { topController.setI(i); kI = i; }
-        if((d != kD)) { topController.setD(d); kD = d; }
-        if((ff != kFF)) { topController.setFF(ff); kFF = ff; }
-        //if((iz != kIz)) { m_pidController.setIZone(iz); kIz = iz; }
-        //if((max != kMaxOutput) || (min != kMinOutput)) { 
-        //m_pidController.setOutputRange(min, max); 
-        //kMinOutput = min; kMaxOutput = max; 
-      //}
-
-        if((p != kP)) { bottomController.setP(p); kP = p; }
-        if((i != kI)) { bottomController.setI(i); kI = i; }
-        if((d != kD)) { bottomController.setD(d); kD = d; }
-        if((ff != kFF)) { bottomController.setFF(ff); kFF = ff; }
-
-
-        topController.setReference(-setpoint, CANSparkMax.ControlType.kVelocity);
-        //topController.setReference(setpoint, CANSparkMax.ControlType.kVelocity, 0, kFF);
-        bottomController.setReference(setpoint, CANSparkMax.ControlType.kVelocity);
+        //topController.setReference(-setpoint, CANSparkMax.ControlType.kVelocity);
+        topController.setReference(-setpoint, ControlType.kVelocity, 0, ShooterConstants.topkFF);
+        bottomController.setReference(-setpoint, ControlType.kVelocity, 0, ShooterConstants.bottomkFF);
 
         SmartDashboard.putNumber("Top RPM", -topEncoder.getVelocity());
         SmartDashboard.putNumber("Bottom RPM", -bottomEncoder.getVelocity());
@@ -158,12 +125,8 @@ public class YeetCannonPID extends SubsystemBase {
         SmartDashboard.putNumber("RPM Error", getError());
         Logger.recordOutput("RPM Error", getError());
 
-        //Shuffleboard.selectTab(tab.getTitle());
-        //ShuffleboardLayout pidGraph = tab.getLayout("PID Graph", BuiltInLayouts.kGrid).withSize(3, 3);
-        //pidGraph.addNumber("RPM Error vs Time", ()-> getError()).withWidget(BuiltInWidgets.kGraph);
-
         Logger.recordOutput("Top shooter rpm", -topEncoder.getVelocity());
-        Logger.recordOutput("Bottom shooter rpm", -bottomEncoder.getVelocity());
+        Logger.recordOutput("Bottom shooter rpm", bottomEncoder.getVelocity());
     }
 
     public void intakeFoward(){
