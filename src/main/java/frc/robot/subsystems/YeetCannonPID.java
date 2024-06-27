@@ -11,13 +11,11 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-//import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class YeetCannonPID extends SubsystemBase {
-  //private final ShuffleboardTab tab = Shuffleboard.getTab("Competition Robot");
     //shooter motors
     private CANSparkMax topShooterMotor;
     private CANSparkMax bottomShooterMotor;
@@ -32,10 +30,7 @@ public class YeetCannonPID extends SubsystemBase {
     private SparkPIDController topController, bottomController;
 
     //PID variables
-    public double maxRPM, setpoint = 0;
-
-    //private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-      //Constants.ShooterConstants.driveKS, Constants.ShooterConstants.driveKV, Constants.ShooterConstants.driveKA);
+    public double maxRPM, setpoint = 0, mps = 0, maxMPS = 31;
 
     public YeetCannonPID(){
         //motors
@@ -54,13 +49,16 @@ public class YeetCannonPID extends SubsystemBase {
         //Max RPM
         maxRPM = 4000;
 
-        SmartDashboard.putNumber("Setpoint", setpoint);
+        //SmartDashboard.putNumber("Setpoint", setpoint);
+        SmartDashboard.putNumber("MPS Setpoint", mps);
 
         configBottorShooterMotor();
         configTopShooterMotor();
         configIntakeMotor();
         resetEncoders();
         configControllers();
+
+        bottomShooterMotor.follow(topShooterMotor);
     }
 
     private void configTopShooterMotor() {
@@ -68,6 +66,7 @@ public class YeetCannonPID extends SubsystemBase {
         topShooterMotor.setSmartCurrentLimit(30);
         topShooterMotor.setIdleMode(IdleMode.kCoast);
         topShooterMotor.enableVoltageCompensation(12);
+        topShooterMotor.setInverted(true);
         topShooterMotor.burnFlash();
       }
     
@@ -76,6 +75,7 @@ public class YeetCannonPID extends SubsystemBase {
         bottomShooterMotor.setSmartCurrentLimit(30);
         bottomShooterMotor.setIdleMode(IdleMode.kCoast);
         bottomShooterMotor.enableVoltageCompensation(12);
+        bottomShooterMotor.setInverted(true);
         bottomShooterMotor.burnFlash();
       }
     
@@ -104,29 +104,49 @@ public class YeetCannonPID extends SubsystemBase {
         bottomEncoder.setPosition(0);
       }
 
-      public double getError(){
-        double err = setpoint - -topEncoder.getVelocity();
-        return err;
+      public double getTopError(){
+        return setpoint - topEncoder.getVelocity();
+      }
+
+      public double getBottomError(){
+        return setpoint - bottomEncoder.getVelocity();
+      }
+
+      public double avgRPM(){
+        return (topEncoder.getVelocity() + bottomEncoder.getVelocity()) / 2;
+      }
+
+      /** returns the wheel speed in meters / second  */
+      public double getMPS(){
+        return .0762 * (( 2 * Math.PI) / 60 ) * avgRPM();
+        //test at 3000 RPM and result should be 23.93 m/s
+      }
+
+      public double mpsToRPM(double val){
+        return (60 / ((2 * Math.PI) * .0762)) * val;
       }
 
       @Override
       public void periodic() {
         //read set point
-        double newSetpoint = SmartDashboard.getNumber("Setpoint", 0);
-        if((newSetpoint != setpoint)&& newSetpoint <= maxRPM) { setpoint = newSetpoint;}
+        //double newSetpoint = SmartDashboard.getNumber("Setpoint", 0);
+        //if((newSetpoint != setpoint)&& newSetpoint <= maxRPM) { setpoint = newSetpoint;}
 
-        //topController.setReference(-setpoint, CANSparkMax.ControlType.kVelocity);
-        topController.setReference(-setpoint, ControlType.kVelocity, 0, ShooterConstants.topkFF);
-        bottomController.setReference(-setpoint, ControlType.kVelocity, 0, ShooterConstants.bottomkFF);
+        double newMPS = SmartDashboard.getNumber("MPS Setpoint", 0);
+        if((newMPS != mps)&& newMPS <= maxMPS){
+          mps = newMPS;
+          setpoint= mpsToRPM(mps);
+        }
 
-        SmartDashboard.putNumber("Top RPM", -topEncoder.getVelocity());
-        SmartDashboard.putNumber("Bottom RPM", -bottomEncoder.getVelocity());
+        topController.setReference(setpoint, ControlType.kVelocity, 0, ShooterConstants.topkFF);
+        //bottomController.setReference(setpoint, ControlType.kVelocity, 0, ShooterConstants.bottomkFF);
 
-        SmartDashboard.putNumber("RPM Error", getError());
-        Logger.recordOutput("RPM Error", getError());
+        SmartDashboard.putNumber("Top RPM", topEncoder.getVelocity());
+        SmartDashboard.putNumber("MPS of Shooter", getMPS());
 
-        Logger.recordOutput("Top shooter rpm", -topEncoder.getVelocity());
-        Logger.recordOutput("Bottom shooter rpm", bottomEncoder.getVelocity());
+        Logger.recordOutput("Top RPM Error", getTopError());
+
+        Logger.recordOutput("Shooter rpm", topEncoder.getVelocity());
     }
 
     public void intakeFoward(){

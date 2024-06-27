@@ -3,20 +3,17 @@ package frc.robot.commands.manual.ControllerCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.Supplier;
-import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.YeetCannonPID;
 
 public class ArmCommand extends Command{
-    private ScoringSubsystem subsystem;
-    private Supplier<Double> rightTrigger, leftTrigger;
+    private YeetCannonPID subsystem;
     private Supplier<Boolean> intakeButtonForward, intakeButtonBackward, shooterButton;
     //private boolean forward, backward, shooterOn;
 
-    public ArmCommand(ScoringSubsystem subsystem, Supplier<Double> rightTrigger,Supplier<Double> leftTrigger,
-    Supplier<Boolean> intakeButtonForward, Supplier<Boolean> intakeButtonBackward, Supplier<Boolean> shooterButton){
+    public ArmCommand(YeetCannonPID subsystem, Supplier<Boolean> intakeButtonForward, 
+    Supplier<Boolean> intakeButtonBackward, Supplier<Boolean> shooterButton){
         addRequirements(subsystem);
         this.subsystem = subsystem;
-        this.rightTrigger = rightTrigger;
-        this.leftTrigger = leftTrigger;
         this.intakeButtonForward = intakeButtonForward;
         this.intakeButtonBackward = intakeButtonBackward;
         this.shooterButton = shooterButton;
@@ -30,26 +27,6 @@ public class ArmCommand extends Command{
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double rightTriggerVal = rightTrigger.get() *.25;
-    double leftTriggerVal = leftTrigger.get() *.25;
-    double sumVal = rightTriggerVal - leftTriggerVal;
-    subsystem.moveArm(sumVal);
-
-    if(intakeButtonForward.get()){
-        subsystem.intake(1);
-    }
-    if(intakeButtonBackward.get()){
-        subsystem.intake(-1);
-    }
-    if(intakeButtonForward.get() == false && intakeButtonBackward.get() == false){
-        subsystem.intake(0);
-    }
-
-    if(shooterButton.get()){
-        subsystem.shooterOn();
-    } else {
-      subsystem.shooterOff();
-    }
   }
 
   // Called once the command ends or is interrupted.

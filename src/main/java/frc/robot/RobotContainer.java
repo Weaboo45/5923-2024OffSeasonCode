@@ -40,7 +40,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.manual.JoyStickCommands.*;
 import frc.robot.commands.manual.ControllerCommands.*;
-import frc.robot.commands.autonomous.SimpleAutonomous;
 import frc.robot.subsystems.*;
 
 /**
@@ -80,7 +79,6 @@ public class RobotContainer {
 
   /// SUBSYSTEMS ///
   public static final SwerveDrivetrain drivetrain = new SwerveDrivetrain();
-  public static final ScoringSubsystem scoreSub = new ScoringSubsystem();
   public static final ArmSubsystem armSub = new ArmSubsystem();
   public static final ClimberSubsystem climbSub = new ClimberSubsystem();
   public static final YeetCannonPID yeetSub = new YeetCannonPID();
@@ -106,7 +104,6 @@ public class RobotContainer {
 
   /// COMMANDS ///
   // Auto Commands
-  private final SimpleAutonomous simpleAuto = new SimpleAutonomous(scoreSub, drivetrain);
 
   // Xbox controls
   private final DriveSwerve drivetrainXbox = new DriveSwerve(drivetrain, () -> -xbox.getLeftY(), ()-> xbox.getLeftX(), ()-> -xbox.getRightX(),
@@ -116,8 +113,6 @@ public class RobotContainer {
   private final DriveJoystickSwerve driveJoystick = new DriveJoystickSwerve(drivetrain, () -> stick.getY(), () -> stick.getX(), () -> stick.getTwist(),
    () -> stick.getRawButton(7), () -> stick.getRawButton(8), () -> stick.getThrottle());
 
-  private final JoystickArmCommand joystickArm = new JoystickArmCommand(scoreSub, climbSub, () -> stick.getRawButton(12),
-   ()-> stick.getRawButton(8), ()-> stick.getRawButton(7), ()-> stick.getRawButton(5), ()-> stick.getRawButton(6));
   /// SHUFFLEBOARD METHODS ///
   /**
    * Use this command to define {@link Shuffleboard} buttons using a
@@ -126,11 +121,6 @@ public class RobotContainer {
    */
   private void configureShuffleboardData() {
     Shuffleboard.selectTab(m_tab.getTitle());
-
-    ShuffleboardLayout encoders = m_tab.getLayout("Encoders", BuiltInLayouts.kGrid).withSize(3, 3);
-    encoders.add("Encoder Reset", new InstantCommand(()-> scoreSub.resetEncoder()));
-    encoders.addNumber("Arm Encoder Angle", ()-> scoreSub.getRevEncoder()).withWidget(BuiltInWidgets.kNumberBar);
-    encoders.addNumber("Arm Encoder Distance", ()-> scoreSub.getDistance()).withWidget(BuiltInWidgets.kNumberBar);
 
     ShuffleboardLayout drivingStyleLayout = m_tab.getLayout("driving styles", BuiltInLayouts.kList)
     .withPosition(0, 0).withSize(2, 2)
@@ -141,10 +131,6 @@ public class RobotContainer {
 
     drivingStyleLayout.add("Joystick Drive",
     new InstantCommand(() -> drivetrain.setDefaultCommand(driveJoystick), drivetrain));
-
-    drivingStyleLayout.add("Joystick Arm Controll",
-    new InstantCommand(() -> scoreSub.setDefaultCommand(joystickArm), scoreSub));
-
  
     ShuffleboardLayout gyroSensor = m_tab.getLayout("NavX", BuiltInLayouts.kGrid)
     .withPosition(2, 0).withSize(1, 3)
@@ -174,7 +160,6 @@ public class RobotContainer {
 
   private void configureSmartDashboard(){
     //match Auto
-    m_chooser.setDefaultOption("Simple Auton", simpleAuto);
     m_chooser.addOption("Amp Auto", new PathPlannerAuto("AmpAuto"));
     m_chooser.addOption("Right Side Path", new PathPlannerAuto("Right Side Path"));
 
@@ -191,7 +176,6 @@ public class RobotContainer {
    */
   private void configureInitialDefaultCommands() {
     drivetrain.setDefaultCommand(drivetrainXbox);
-    scoreSub.setDefaultCommand(joystickArm);
   }
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
@@ -200,8 +184,6 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureBindings() {
-    SmartDashboard.putData("Intake Auto", simpleAuto);
-
     //ampScoring.whileTrue( new ParallelCommandGroup( new AutoIntake(scoreSub), new AutoShoot(scoreSub) ) );
 
     //shooter button

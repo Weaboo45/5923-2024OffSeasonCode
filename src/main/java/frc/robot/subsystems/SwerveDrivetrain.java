@@ -186,7 +186,7 @@ public class SwerveDrivetrain extends SubsystemBase {
     field.setRobotPose(getPose());
   
     SmartDashboard.putNumber("Robot Angle", rawYawValue);
-    SmartDashboard.putString("Pose", getPose().toString());
+    //SmartDashboard.putString("Pose", getPose().toString());
     SmartDashboard.putString("Angular Speed", new DecimalFormat("#.00").format((rates[2] / 180)) + "pi rad/s");
 
     //Pose2d poseA = getPose();

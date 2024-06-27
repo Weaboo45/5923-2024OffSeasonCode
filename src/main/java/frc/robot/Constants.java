@@ -27,15 +27,7 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final int rightArmMotorID = 10;
-  public static final int leftArmMotorID = 11;
-
-  public static final int topShooterMotorID = 17; //12
-  public static final int bottomShooterMotorID = 18; //13
-
-  public static final int intakeMotorID = 19; //14
-
-    public static final Mode currentMode = Mode.REAL;
+  public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -199,16 +191,14 @@ public final class Constants {
     public static final double kVVoltSecondPerRad = 0.5;
     public static final double kAVoltSecondSquaredPerRad = 0.1;
 
-    public static final double kMaxVelocityRadPerSecond = 2;
-    public static final double kMaxAccelerationRadPerSecSquared = 3;
+    public static final double kMaxVelocityRadPerSecond = .5;
+    public static final double kMaxAccelerationRadPerSecSquared = .5;
 
     public static final double angleOffsetDegree = 0.0; //5.75
     public static final double angleOffsetRadian = angleOffsetDegree * (Math.PI / 180);
 
     public static final double kUpperLimit = 90.0;
     public static final double kLowerLimit = 0.0;
-
-    //public static final double kArmOffsetRads = .1;
     }
 
     public static final class ClimberConstants{
@@ -224,7 +214,12 @@ public final class Constants {
       public static final int bottomShooterMotorID = 13; //13
       public static final int intakeMotorID = 14; //14
 
-      public static final int wheelDiameter = 6; //inches
+      public static final double topkP = 0.00015;
+      public static final double topkI = 0.0000007;
+      public static final double topkFF = 0.0002;
 
+      public static final double bottomkP = 0.00015;
+      public static final double bottomkI = 0.0000007;
+      public static final double bottomkFF = 0.0002;
     }
 }
