@@ -13,21 +13,10 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-//import org.opencv.core.Mat;
-//import org.opencv.core.Point;
-//import org.opencv.core.Scalar;
-//import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.first.cameraserver.CameraServer;
-//import edu.wpi.first.cscore.UsbCamera;
-//import edu.wpi.first.cscore.CvSink;
-//import edu.wpi.first.cscore.CvSource;
-//import edu.wpi.first.cscore.UsbCamera;
-//import edu.wpi.first.wpilibj.PowerDistribution;
-//import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-//import frc.lib.CTREConfigs;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -50,6 +39,22 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
 
+    Logger.recordMetadata("ProjectName", "5923-2024OffSeasonCode"); // Set a metadata value
+
+    if (isReal()) {
+      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      //new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+    } else {
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    }
+
+  // Logger.disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
+  Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
     try {
           CameraServer.startAutomaticCapture();
           System.out.println("Connected to camera.");
@@ -57,80 +62,8 @@ public class Robot extends LoggedRobot {
       // TODO: handle exception
       System.out.println("An error ocurred when connecting to the camera. STACK: " + e.getStackTrace());
     }
-    /*
-    visioThread = new Thread(
-      ()->{
-        UsbCamera camera = CameraServer.startAutomaticCapture();
-        camera.setResolution(640, 480);
 
-        CvSink cvSink = CameraServer.getVideo();
-        CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 480);
-
-        Mat mat = new Mat();
-
-        while(!Thread.interrupted()){
-          if(cvSink.grabFrame(mat) == 0){
-            outputStream.notifyError(cvSink.getError());
-            continue;
-          }
-
-          Imgproc.rectangle(mat, new Point(100,100), new Point(400, 400), new Scalar(255, 255, 255), 5);
-          outputStream.putFrame(mat);
-        }
-      });
-    //ctreConfigs = new CTREConfigs();
-    visioThread.setDaemon(true);
-    visioThread.start();
-    */
-    
-
-    // Record metadata
-    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-    switch (BuildConstants.DIRTY) {
-      case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
-        break;
-      case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        break;
-      default:
-        Logger.recordMetadata("GitDirty", "Unknown");
-        break;
-    }
-
-    // Set up data receivers & replay source
-    switch (Constants.currentMode) {
-      case REAL:
-        // Running on a real robot, log to a USB stick
-        Logger.addDataReceiver(new WPILOGWriter("/U"));
-        //Logger.addDataReceiver(new WPILOGWriter("C:/Users/ynots/Documents/WPILogs2024"));
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM:
-        // Running a physics simulator, log to NT
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case REPLAY:
-        // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        break;
-    }
-
-    // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-    // Logger.disableDeterministicTimestamps()
-
-    // Start AdvantageKit logger
-Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
-    m_robotContainer = new RobotContainer();
+  m_robotContainer = new RobotContainer();
   }
 
   /**
