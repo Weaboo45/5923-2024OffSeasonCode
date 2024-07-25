@@ -53,6 +53,16 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Arm D", kD);
     SmartDashboard.putNumber("Arm FF", kFF);
 
+    rightArmController.setP(kP);
+    rightArmController.setI(kI);
+    rightArmController.setD(kD);
+    rightArmController.setFF(kFF);
+
+    leftArmController.setP(kP);
+    leftArmController.setI(kI);
+    leftArmController.setD(kD);
+    leftArmController.setFF(kFF);
+
     // Setpoint Val
     SmartDashboard.putNumber("Arm Setpoint", setPoint);
   }
@@ -70,12 +80,16 @@ public class ArmSubsystem extends SubsystemBase {
     //Changable PID vals from dashboard
     double newSet = SmartDashboard.getNumber("Arm Setpoint", 0);
       if(newSet != setPoint){  setPoint = newSet; }
+
     double newP = SmartDashboard.getNumber("Arm P", 0);
       if(newP != kP){  kP = newP; rightArmController.setP(kP); }
+
     double newI = SmartDashboard.getNumber("Arm I", 0);
       if(newI != kI){  kI = newI; rightArmController.setI(kI); }
+
     double newD = SmartDashboard.getNumber("Arm D", 0);
       if(newD != kD){  kD = newD; rightArmController.setD(kD); }
+
     double newFF = SmartDashboard.getNumber("Arm FF", 0);
       if(newFF != kFF){  kD = newD; rightArmController.setFF(kFF); }
 
