@@ -5,43 +5,42 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.manual.ControllerCommands;
+package frc.robot.commands.driveCommands.JoyStickCommands;
 
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.SwerveDrivetrain;
+import frc.robot.subsystems.SwerveSubsystems.SwerveDrivetrain;
 
 
-public class DriveSwerve extends Command {
+public class DriveJoystickSwerve extends Command {
   /*
    * Creates a new DriveMecanum.
    */
 
   private SwerveDrivetrain drivetrain;
-  private Supplier<Double>  y, x, z;
-  private Supplier<Boolean> fieldTOrientated, resetGyro;
+  private Supplier<Double>  y, x, z, multiplier;
+  private Supplier<Boolean> fieldTOrientated, zeroHeading;
   boolean fieldDrive = true, onOff = false;
-  double speed = 3.5;
 
   private SlewRateLimiter translationLimiter = new SlewRateLimiter(2.0);
   private SlewRateLimiter strafeLimiter = new SlewRateLimiter(2.0);
   private SlewRateLimiter rotationLimiter = new SlewRateLimiter(4.0);
 
 
-  public DriveSwerve(SwerveDrivetrain drivetrain, Supplier<Double> yDirect, Supplier<Double> xDirect, 
-  Supplier<Double> rotation, Supplier<Boolean> fieldTOrientated, Supplier<Boolean> resetGyro) {
+  public DriveJoystickSwerve(SwerveDrivetrain drivetrain, Supplier<Double> yDirect, Supplier<Double> xDirect, 
+  Supplier<Double> rotation, Supplier<Boolean> fieldTOrientated, Supplier<Boolean> zeroHeading, Supplier<Double> multiplier) {
     addRequirements(drivetrain);
     this.drivetrain = drivetrain;
+    this.zeroHeading = zeroHeading;
     this.y = yDirect;
     this.x = xDirect;
     this.z = rotation;
-    this.resetGyro = resetGyro;
+    this.multiplier = multiplier;
     this.fieldTOrientated = fieldTOrientated; // toggle
   }
 
@@ -54,14 +53,15 @@ public class DriveSwerve extends Command {
   @Override
   public void execute() {
 
-    if(resetGyro.get()){
+    if(zeroHeading.get()){
       drivetrain.zeroHeading();
     }
 
-    SmartDashboard.putBoolean("Field Drive", fieldDrive);
-    if(fieldTOrientated.get()){
-      fieldDrive = !fieldDrive;
+    double mult = -multiplier.get() * 2 + 3; //trying to make -1 to 1 turn to 1 to 4
+    if(mult > 4){
+      mult = 4;
     }
+    
 
     /* Get Values, Deadband */
     double translationVal = translationLimiter
@@ -71,14 +71,17 @@ public class DriveSwerve extends Command {
     double rotationVal = rotationLimiter
         .calculate(MathUtil.applyDeadband(z.get(), Constants.ROTATION_DEADBAND));
 
-    drivetrain.swerveDrive( new Translation2d(translationVal * 3, strafeVal * 3),
-      rotationVal * 4, fieldDrive, false);
+    if(fieldTOrientated.get()){
+      fieldDrive = !fieldDrive;
+    }
+
+    drivetrain.swerveDrive( new Translation2d(-translationVal * mult, strafeVal * mult),
+      -rotationVal * 4, fieldDrive, false);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    //drivetrain.stopModules();
+  public void end(boolean interrupted) {;
   }
 
   // Returns true when the command should end.

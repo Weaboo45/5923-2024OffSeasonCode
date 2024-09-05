@@ -130,13 +130,6 @@ public final class Constants {
     public static final double TURN_MOTOR_PCONVERSION = 360 / TURN_MOTOR_GEAR_RATIO;
     public static final double DRIVE_MOTOR_VCONVERSION = DRIVE_MOTOR_PCONVERSION / 60.0;
 
-    //Arm motor Conversion Factors
-    public static final double ARM_MOTOR_GEAR_RATIO = 0.1875;
-    public static final double ARM_DIAMETER = Units.inchesToMeters(35); //inches
-
-    public static final double ARM_MOTOR_PCONVERSION = ARM_DIAMETER * Math.PI / ARM_MOTOR_GEAR_RATIO;
-    public static final double ARM_MOTOR_VCONVERSION = ARM_MOTOR_PCONVERSION / 60.0;
-
     // Autonomous drivetrain PID
     public static double AUTON_KP = 0;
     public static double AUTON_KI = 0;
@@ -145,7 +138,6 @@ public final class Constants {
 
     //Odometry
     public static final boolean invertGyro = false;
-
 
     public static final double driveKS = 0.1;
     public static final double driveKV = 2.3;
@@ -163,42 +155,29 @@ public final class Constants {
 
       
     public static final class ArmConstants {
+      //Motor IDs
+      public static final int rightArmMotorID = 10;
+      public static final int leftArmMotorID = 11;
 
-    //Arm motor Conversion Factors
-    public static final double ARM_MOTOR_GEAR_RATIO = 0.1875;
-    public static final double ARM_DIAMETER = Units.inchesToMeters(35);
+      //Encoder ID
+      public static final int kEncoderPort = 0;
+    
+      //Arm motor Conversion Factors
+      public static final double ARM_MOTOR_GEAR_RATIO = 0.1875;
+      public static final double ARM_DIAMETER = Units.inchesToMeters(35);
 
-    public static final double ARM_MOTOR_PCONVERSION = ARM_DIAMETER * Math.PI / ARM_MOTOR_GEAR_RATIO;
-    public static final double ARM_MOTOR_VCONVERSION = ARM_MOTOR_PCONVERSION / 60;
+      public static final double ARM_MOTOR_PCONVERSION = ARM_DIAMETER * Math.PI / ARM_MOTOR_GEAR_RATIO;
+      public static final double ARM_MOTOR_VCONVERSION = ARM_MOTOR_PCONVERSION / 60;
 
-    public static final int rightArmMotorID = 10;
-    public static final int leftArmMotorID = 11;
+      //PID values
+      public static final double kP = 0.05;
+      public static final double kI = 0.00;
+      public static final double kD = 0.05;
+      public static final double kF = 0.00;
 
-    //filler vals
-    public static final int kEncoderPort = 0;
-
-    public static final double kP = 0.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kTolerance = 0.0;
-
-    public static final int kEncoderPPR = 1025; // 975.6  ||try both
-    public static final double kEncoderDistancePerPulse = ARM_MOTOR_PCONVERSION / kEncoderPPR;
-
-    // These are fake gains; in actuality these must be determined individually for each robot
-    public static final double kSVolts = 1;
-    public static final double kGVolts = 1;
-    public static final double kVVoltSecondPerRad = 0.5;
-    public static final double kAVoltSecondSquaredPerRad = 0.1;
-
-    public static final double kMaxVelocityRadPerSecond = .5;
-    public static final double kMaxAccelerationRadPerSecSquared = .5;
-
-    public static final double angleOffsetDegree = 0.0; //5.75
-    public static final double angleOffsetRadian = angleOffsetDegree * (Math.PI / 180);
-
-    public static final double kUpperLimit = 90.0;
-    public static final double kLowerLimit = 0.0;
+      //Button Setpoints in degrees
+      public static final double homePoint = 40;
+      public static final double apmPoint = 90;
     }
 
     public static final class ClimberConstants{
@@ -210,16 +189,15 @@ public final class Constants {
     }
 
     public static final class ShooterConstants {
+      //Shooter System IDs
       public static final int topShooterMotorID = 12; //12
       public static final int bottomShooterMotorID = 13; //13
       public static final int intakeMotorID = 14; //14
 
+      //PID values
       public static final double topkP = 0.00015;
       public static final double topkI = 0.0000007;
       public static final double topkFF = 0.0002;
-
-      public static final double bottomkP = 0.00015;
-      public static final double bottomkI = 0.0000007;
-      public static final double bottomkFF = 0.0002;
+      //if needed bottom pid is the same vals
     }
 }

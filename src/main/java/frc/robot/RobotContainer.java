@@ -8,19 +8,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-//import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 
 import java.util.Map;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-//import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-//import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.GenericHID;
-//import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 
@@ -35,12 +30,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-//import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-//import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.manual.JoyStickCommands.*;
-import frc.robot.commands.manual.ControllerCommands.*;
-import frc.robot.subsystems.*;
+
+import frc.robot.commands.driveCommands.JoyStickCommands.*;
+import frc.robot.commands.driveCommands.ControllerCommands.*;
+
+import frc.robot.subsystems.PIDSubsystems.*;
+import frc.robot.subsystems.SwerveSubsystems.SwerveDrivetrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -80,7 +77,6 @@ public class RobotContainer {
   /// SUBSYSTEMS ///
   public static final SwerveDrivetrain drivetrain = new SwerveDrivetrain();
   public static final ArmSubsystem armSub = new ArmSubsystem();
-  public static final ClimberSubsystem climbSub = new ClimberSubsystem();
   public static final YeetCannonPID yeetSub = new YeetCannonPID();
 
   /// OI DEVICES / HARDWARE ///
@@ -88,7 +84,7 @@ public class RobotContainer {
   private final Joystick stick = new Joystick(1);
   private static final AHRS ahrs = new AHRS(Port.kMXP);
 
-  //CommandXboxController commandXbox = new CommandXboxController(0);
+  CommandXboxController commandXbox = new CommandXboxController(0);
 
   //Joystick Button Commands
   JoystickButton shooterOn = new JoystickButton(stick, 1);
@@ -97,14 +93,7 @@ public class RobotContainer {
   JoystickButton intakeFoward = new JoystickButton(stick, 2);
   JoystickButton intakeBackward = new JoystickButton(stick, 3);
 
-  //climber buttons
-  //JoystickButton climbUp = new JoystickButton(stick, 10);
-  //JoystickButton climbDown = new JoystickButton(stick, 9);
-  //JoystickButton climbStop = new JoystickButton(stick, 11);
-
   /// COMMANDS ///
-  // Auto Commands
-
   // Xbox controls
   private final DriveSwerve drivetrainXbox = new DriveSwerve(drivetrain, () -> -xbox.getLeftY(), ()-> xbox.getLeftX(), ()-> -xbox.getRightX(),
    () -> xbox.getRightBumperReleased(), ()-> xbox.getLeftBumper()); //RB toggles field orintation || LB resets heading
@@ -186,7 +175,7 @@ public class RobotContainer {
   private void configureBindings() {
     //ampScoring.whileTrue( new ParallelCommandGroup( new AutoIntake(scoreSub), new AutoShoot(scoreSub) ) );
 
-    //shooter button
+    //shooter disable
     shooterOn.onTrue
     (Commands.run(
       ()-> {
@@ -194,39 +183,17 @@ public class RobotContainer {
       }, yeetSub));
 
       //intake buttons
-    intakeFoward.onTrue
+    intakeFoward.whileTrue
     (Commands.run(
       ()-> {
           yeetSub.intakeFoward();
       }, yeetSub));
 
-    intakeBackward.onTrue
+    intakeBackward.whileTrue
     (Commands.run(
       ()-> {
         yeetSub.intakeBackward();
       }, yeetSub));
-
-    //climb buttons
-    /*
-    climbUp.whileTrue
-    (Commands.run(
-      ()-> {
-        climbSub.climbUp();
-      }, climbSub));
-
-    climbDown.whileTrue
-    (Commands.run(
-      ()-> {
-        climbSub.climbDown();
-      }, climbSub));
-
-    climbStop.onTrue
-    (Commands.run(
-      ()-> {
-        climbSub.climbStop();
-        scoreSub.moveArm(0);
-      }, climbSub, scoreSub));
-      */
   }
 
     
