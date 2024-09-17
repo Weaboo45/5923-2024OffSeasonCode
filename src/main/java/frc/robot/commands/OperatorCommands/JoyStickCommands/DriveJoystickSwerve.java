@@ -5,13 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.driveCommands.JoyStickCommands;
+package frc.robot.commands.OperatorCommands.JoyStickCommands;
 
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveSubsystems.SwerveDrivetrain;
@@ -26,10 +24,6 @@ public class DriveJoystickSwerve extends Command {
   private Supplier<Double>  y, x, z, multiplier;
   private Supplier<Boolean> fieldTOrientated, zeroHeading;
   boolean fieldDrive = true, onOff = false;
-
-  private SlewRateLimiter translationLimiter = new SlewRateLimiter(2.0);
-  private SlewRateLimiter strafeLimiter = new SlewRateLimiter(2.0);
-  private SlewRateLimiter rotationLimiter = new SlewRateLimiter(4.0);
 
 
   public DriveJoystickSwerve(SwerveDrivetrain drivetrain, Supplier<Double> yDirect, Supplier<Double> xDirect, 
@@ -64,18 +58,15 @@ public class DriveJoystickSwerve extends Command {
     
 
     /* Get Values, Deadband */
-    double translationVal = translationLimiter
-        .calculate(MathUtil.applyDeadband(y.get(), Constants.SPEED_DEADBAND));
-    double strafeVal = strafeLimiter
-        .calculate(MathUtil.applyDeadband(x.get(), Constants.STRAFING_DEADBAND));
-    double rotationVal = rotationLimiter
-        .calculate(MathUtil.applyDeadband(z.get(), Constants.ROTATION_DEADBAND));
+    double translationVal = MathUtil.applyDeadband(y.get(), Constants.SPEED_DEADBAND);
+    double strafeVal = MathUtil.applyDeadband(x.get(), Constants.STRAFING_DEADBAND);
+    double rotationVal = MathUtil.applyDeadband(z.get(), Constants.ROTATION_DEADBAND);
 
     if(fieldTOrientated.get()){
       fieldDrive = !fieldDrive;
     }
 
-    drivetrain.swerveDrive( new Translation2d(-translationVal * mult, strafeVal * mult),
+    drivetrain.drive(-translationVal * mult, strafeVal * mult,
       -rotationVal * 4, fieldDrive, false);
   }
 

@@ -30,7 +30,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final DigitalInput zeroSwitch = new DigitalInput(1), ninetySwitch = new DigitalInput(9);
 
-  public double setpoint = 0;
+  public double setpoint = 45;
   
   public ArmSubsystem() {
     rightArmMotor = new CANSparkMax(ArmConstants.rightArmMotorID, MotorType.kBrushless);
@@ -105,11 +105,11 @@ public class ArmSubsystem extends SubsystemBase {
       if(newSet != getSetpoint()){  setSetpoint(newSet); }
       */
 
-    if(zeroSwitch.get() && (rightArmMotor.get() <= 0)){ //try using softlimits on the motors
+    if(zeroSwitch.get() && (rightArmMotor.getAppliedOutput() > 0)){ //try using softlimits on the motors
       rightArmMotor.set(0);
       leftArmMotor.set(0);
     } else {
-      if(ninetySwitch.get() && (rightArmMotor.get() >= 0)){
+      if(ninetySwitch.get() && (rightArmMotor.getAppliedOutput() < 0)){
         rightArmMotor.set(0);
         leftArmMotor.set(0);
       } else {
@@ -127,7 +127,7 @@ public class ArmSubsystem extends SubsystemBase {
     return avg;
   }
 
-  /** Shooter Angle in degrees */ //shooter is ~60 degrees offset from arm
+  /** Shooter Angle in degrees */ //shooter is ~60 degrees offset from arm so when arm angle == 0, shooter angle == 60 in CAD
   public double getRevEncoder(){
     return absoluteEncoder.getDistance() * 360;
   }

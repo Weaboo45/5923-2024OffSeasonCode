@@ -32,10 +32,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import frc.robot.commands.driveCommands.JoyStickCommands.*;
-import frc.robot.commands.driveCommands.ControllerCommands.*;
-
+import frc.robot.commands.OperatorCommands.ControllerCommands.*;
+import frc.robot.commands.OperatorCommands.JoyStickCommands.*;
 import frc.robot.subsystems.PIDSubsystems.*;
 import frc.robot.subsystems.SwerveSubsystems.SwerveDrivetrain;
 
@@ -95,8 +93,9 @@ public class RobotContainer {
 
   /// COMMANDS ///
   // Xbox controls
-  private final DriveSwerve drivetrainXbox = new DriveSwerve(drivetrain, () -> -xbox.getLeftY(), ()-> xbox.getLeftX(), ()-> -xbox.getRightX(),
-   () -> xbox.getRightBumperReleased(), ()-> xbox.getLeftBumper()); //RB toggles field orintation || LB resets heading
+  private final DriveSwerve drivetrainXbox = new DriveSwerve(drivetrain, ()-> -xbox.getLeftY(), ()-> xbox.getLeftX(), ()-> -xbox.getRightX(),
+   ()-> xbox.getRightBumperReleased(), ()-> xbox.getLeftBumper(), ()-> xbox.getXButtonPressed(), ()-> xbox.getBButtonPressed()); 
+  //    RB toggles field orintation         LB resets heading             forms X with wheels     enables the acceleration limit
 
   // Joystick Controls
   private final DriveJoystickSwerve driveJoystick = new DriveJoystickSwerve(drivetrain, () -> stick.getY(), () -> stick.getX(), () -> stick.getTwist(),
