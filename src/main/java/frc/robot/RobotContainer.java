@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.OperatorCommands.ControllerCommands.*;
 import frc.robot.commands.OperatorCommands.JoyStickCommands.*;
+import frc.robot.commands.autoCommands.PIDButtons;
 import frc.robot.subsystems.PIDSubsystems.*;
 import frc.robot.subsystems.SwerveSubsystems.SwerveDrivetrain;
 
@@ -101,6 +102,8 @@ public class RobotContainer {
   private final DriveJoystickSwerve driveJoystick = new DriveJoystickSwerve(drivetrain, () -> stick.getY(), () -> stick.getX(), () -> stick.getTwist(),
    () -> stick.getRawButton(7), () -> stick.getRawButton(8), () -> stick.getThrottle());
 
+  private final PIDButtons buttons = new PIDButtons(armSub, yeetSub, ()-> stick.getRawButton(8), ()-> stick.getRawButton(7));
+
   /// SHUFFLEBOARD METHODS ///
   /**
    * Use this command to define {@link Shuffleboard} buttons using a
@@ -164,6 +167,8 @@ public class RobotContainer {
    */
   private void configureInitialDefaultCommands() {
     drivetrain.setDefaultCommand(drivetrainXbox);
+    armSub.setDefaultCommand(buttons);
+    yeetSub.setDefaultCommand(buttons);
   }
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
