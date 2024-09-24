@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import java.util.Map;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+//import com.pathplanner.lib.auto.AutoBuilder;
+//import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -53,11 +53,11 @@ public class RobotContainer {
   /*
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  private final SendableChooser<Command> m_chooser;
+  //private final SendableChooser<Command> m_chooser;
     //private final ScoreAmp scoreAmp = new ScoreAmp(scoreSub);
 
   public RobotContainer() {
-    m_chooser = AutoBuilder.buildAutoChooser();
+    //m_chooser = AutoBuilder.buildAutoChooser();
 
     configureInitialDefaultCommands();
     configureBindings();
@@ -66,7 +66,7 @@ public class RobotContainer {
 
     //NamedCommands.registerCommand("ScoreAmp", ampScore);
 
-    SmartDashboard.putData("Auto Mode", m_chooser);
+    //SmartDashboard.putData("Auto Mode", m_chooser);
   }
 
   // The robot's subsystems and commands are defined here...
@@ -151,14 +151,14 @@ public class RobotContainer {
 
   private void configureSmartDashboard(){
     //match Auto
-    m_chooser.addOption("Amp Auto", new PathPlannerAuto("AmpAuto"));
-    m_chooser.addOption("Right Side Path", new PathPlannerAuto("Right Side Path"));
+    //m_chooser.addOption("Amp Auto", new PathPlannerAuto("AmpAuto"));
+    //m_chooser.addOption("Right Side Path", new PathPlannerAuto("Right Side Path"));
 
     //test Autos
-    m_chooser.addOption("Square", new PathPlannerAuto("SquareAuto"));
-    m_chooser.addOption("Test Auto", new PathPlannerAuto("Test Auto"));
-    m_chooser.addOption("Intake and shooter test", new PathPlannerAuto("IntakeShoot"));
-    SmartDashboard.putData(m_chooser);
+    //m_chooser.addOption("Square", new PathPlannerAuto("SquareAuto"));
+    //m_chooser.addOption("Test Auto", new PathPlannerAuto("Test Auto"));
+    //m_chooser.addOption("Intake and shooter test", new PathPlannerAuto("IntakeShoot"));
+    //SmartDashboard.putData(m_chooser);
   }
 
   /**   
@@ -215,7 +215,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  //public Command getAutonomousCommand() {
     // Executes the autonomous command chosen in smart dashboard
 
     // Load the path you want to follow using its name in the GUI
@@ -223,11 +223,11 @@ public class RobotContainer {
 
         // Create a path following command using AutoBuilder. This will also trigger event markers.
         //return AutoBuilder.followPath(path);
-    return m_chooser.getSelected();
-  }
+    //return m_chooser.getSelected();
+  //}
 
   public void displayValues() {
   SmartDashboard.putData(drivetrain);
-  SmartDashboard.putData(m_chooser);
+  //SmartDashboard.putData(m_chooser);
   }
 }
