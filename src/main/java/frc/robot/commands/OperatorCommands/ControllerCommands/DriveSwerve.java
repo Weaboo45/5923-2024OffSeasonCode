@@ -57,8 +57,8 @@ public class DriveSwerve extends Command {
     }
 
     if(yesX){
-      drivetrain.setX();
       drivetrain.drive(0, 0, 0, fieldDrive, onOff);
+      drivetrain.setX();
     }
 
     if(rateLim.get()){

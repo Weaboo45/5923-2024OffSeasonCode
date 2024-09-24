@@ -137,6 +137,7 @@ public class ArmSubsystem extends SubsystemBase {
     return getSetpoint() - rightArmEncoder.getPosition();
   }
 
+  /**The new arm set point in degrees */
   public void setSetpoint(double newPoint){
     setpoint = newPoint;
   }
